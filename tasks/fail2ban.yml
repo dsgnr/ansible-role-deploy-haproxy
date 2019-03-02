@@ -1,0 +1,25 @@
+---
+- name: Install Fail2Ban
+  yum:
+    name: fail2ban
+    state: present
+
+- name: Send HAProxy configuration
+  copy:
+    src: "templates/unifi-400-jail.conf"
+    dest: /etc/fail2ban/jail.d/01-unifi-400.conf
+    owner: root
+    group: root
+    mode: 0644
+    force: no
+
+- name: Send HAProxy configuration
+  copy:
+    src: "templates/unifi-400-filter.conf"
+    dest: /etc/fail2ban/filter.d/unifi-400.conf
+    owner: root
+    group: root
+    mode: 0644
+    force: no
+  notify:
+    - restart fail2ban

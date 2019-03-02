@@ -1,0 +1,21 @@
+---
+
+- name: Include tasks for Ubuntu and Debian
+  include_tasks: ubuntu.yml
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Include tasks for Centos and RHEL
+  include_tasks: rhel.yml
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Send HAProxy configuration
+  copy:
+    src: "templates/{{ inventory_hostname }}/haproxy.cfg"
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+    validate: /usr/sbin/haproxy -f %s -c -q
+  notify:
+    - restart haproxy

@@ -1,0 +1,36 @@
+---
+
+- name: Check if IUS is installed
+  yum:
+    list: ius-release
+  register: check_installed
+
+- name: Set OS distribution
+  set_fact:
+    ius_distribution_abbrev: "{{ (ansible_distribution == 'CentOS') | ternary('centos', 'rhel') }}"
+  when: "check_installed.results[0].yumstate != 'installed'"
+
+- name: install IUS release package
+  yum:
+    name: "https://{{ ius_distribution_abbrev }}{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
+    state: present
+  register: install_ius
+  when: "check_installed.results[0].yumstate != 'installed'"
+
+- name: Import IUS Community Project GPG key
+  rpm_key: key=http://dl.iuscommunity.org/pub/ius/IUS-COMMUNITY-GPG-KEY state=present
+  when: install_ius is changed
+
+- name: Install HAProxy
+  yum:
+    name: haproxy18u
+    state: present
+
+- name: Enable HAProxy service
+  service:
+    name: haproxy
+    enabled: yes
+
+- name: Include tasks for Rsyslog CentOS/RHEL
+  include_tasks: rsyslog.yml
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

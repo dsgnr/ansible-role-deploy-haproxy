@@ -1,0 +1,25 @@
+---
+- name: Install software-properties-common
+  apt:
+    name: software-properties-common
+    state: present
+
+- name: Install HAProxy repository
+  apt_repository:
+    repo: ppa:vbernat/haproxy-1.9
+    state: present
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install HAProxy
+  apt:
+    name: haproxy
+    state: present
+
+- name: Start HAProxy service
+  service:
+    name: haproxy
+    state: started
+    enabled: yes

@@ -1,0 +1,12 @@
+---
+
+- name: Send Rsyslog configuration
+  copy:
+    src: "templates/rsyslog-haproxy.conf"
+    dest: /etc/rsyslog.d/haproxy.conf.conf
+    owner: root
+    group: root
+    mode: 0644
+    force: no
+  notify:
+    - restart rsyslog
